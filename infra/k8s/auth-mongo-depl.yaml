@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-mongo
+  template:
+    metadata:
+      labels:
+        app: auth-mongo #actually applies this name to pod it creates
+    spec:
+      containers:
+        - name: auth-mongo
+          image: mongo #refers to the officially hosted image on docker hub that we can run to get a mongodb db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-mongo-srv
+spec:
+  selector:
+    app: auth-mongo #tells srv which pods it governs access to
+  ports:
+    - name: db #name here is just for logging purposes.
+      protocol: TCP
+      port: 27017
+      targetPort: 27017 #we use this port because by default mongodb listens to traffic on this port. default port for

@@ -1,0 +1,5 @@
+export const stripe = {
+  charges: {
+    create: jest.fn().mockResolvedValue({}), //makes sure that whenever we call create() we get back a promise that auto resolves itself with an empty obj. we do this because in new.ts when we call create for real, we get back a promise that we await
+  },
+};

@@ -1,0 +1,58 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  local:
+    push: false #whenever we build img, prevents it being pushed to docker hub
+  artifacts: #all the things being built
+    - image: vipsdm10/auth
+      context: auth #folder which contains all the code for this img
+      docker:
+        dockerfile: Dockerfile
+      sync: #tells skaffold how to handle changes in files
+        manual:
+          - src: 'src/**/*.ts' #find and watch all the ts files
+            dest: . #means where to sync this file inside of our running container. take wherever the file is from and throw it in the corresponding path in the Container
+    - image: vipsdm10/client
+      context: client #folder which contains all the code for this img
+      docker:
+        dockerfile: Dockerfile
+      sync: #tells skaffold how to handle changes in files
+        manual:
+          - src: '**/*.js' #find and watch all the ts files
+            dest: .
+    - image: vipsdm10/tickets
+      context: tickets #folder which contains all the code for this img
+      docker:
+        dockerfile: Dockerfile
+      sync: #tells skaffold how to handle changes in files
+        manual:
+          - src: 'src/**/*.ts' #find and watch all the ts files
+            dest: .
+    - image: vipsdm10/orders
+      context: orders #folder which contains all the code for this img
+      docker:
+        dockerfile: Dockerfile
+      sync: #tells skaffold how to handle changes in files
+        manual:
+          - src: 'src/**/*.ts' #find and watch all the ts files
+            dest: .
+    - image: vipsdm10/expiration
+      context: expiration #folder which contains all the code for this img
+      docker:
+        dockerfile: Dockerfile
+      sync: #tells skaffold how to handle changes in files
+        manual:
+          - src: 'src/**/*.ts' #find and watch all the ts files
+            dest: .
+    - image: vipsdm10/payments
+      context: payments #folder which contains all the code for this img
+      docker:
+        dockerfile: Dockerfile
+      sync: #tells skaffold how to handle changes in files
+        manual:
+          - src: 'src/**/*.ts' #find and watch all the ts files
+            dest: .

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-redis-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expiration-redis
+  template:
+    metadata:
+      labels:
+        app: expiration-redis #actually applies this name to pod it creates
+    spec:
+      containers:
+        - name: expiration-redis
+          image: redis #refers to the officially hosted image on docker hub that we can run to get a redis db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expiration-redis-srv
+spec:
+  selector:
+    app: expiration-redis #tells srv which pods it governs access to
+  ports:
+    - name: db #name here is just for logging purposes.
+      protocol: TCP
+      port: 6379
+      targetPort: 6379 #redis by default uses this port

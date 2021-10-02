@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tickets #the purpose of this selector is to tell the depl how to find all the pods it creates
+  template: #describes how to create each diff pod that this depl creates
+    metadata:
+      labels:
+        app: tickets
+    spec: #tells the pod how to behave
+      containers:
+        - name: tickets
+          image: vipsdm10/tickets
+          env: #list out all diff env vars we want access to inside this container
+            - name: NATS_CLIENT_ID #the client ID needs to be unique for every instance
+              valueFrom: #we want to take the pod's name and assign it as the client ID
+                fieldRef:
+                  fieldPath: metadata.name #pod name is unique and randomly generated so can be used as client id
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: MONGO_URI
+              value: 'mongodb://tickets-mongo-srv:27017/tickets' #tickets is the name of the db. if none exists mongo creates a new one for us
+            - name: JWT_KEY #name of env var as it shows up inside the container
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret #name of secret we create
+                  key: JWT_KEY #the actual key inside of that secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickets-srv
+spec: #tells service how to behave. we do not define a type here coz default is clusterip which is what we want
+  selector: #tells service how to find the set of pods that it governs access to
+    app: tickets
+  ports:
+    - name: tickets
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

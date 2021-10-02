@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expiration #the purpose of this selector is to tell the depl how to find all the pods it creates
+  template: #describes how to create each diff pod that this depl creates
+    metadata:
+      labels:
+        app: expiration
+    spec: #tells the pod how to behave
+      containers:
+        - name: expiration
+          image: vipsdm10/expiration
+          env: #list out all diff env vars we want access to inside this container
+            - name: NATS_CLIENT_ID #the client ID needs to be unique for every instance
+              valueFrom: #we want to take the pod's name and assign it as the client ID
+                fieldRef:
+                  fieldPath: metadata.name #pod name is unique and randomly generated so can be used as client id
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+#this srv is not contacted by any other part of our app directly. also no n/w reqs goin directly to the exp srv. therefore we do not need a cluster ip srv at all

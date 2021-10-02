@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-depl
+spec:
+  replicas: 1 #1 single pod for our next js app
+  selector:
+    matchLabels:
+      app: client
+  template: #describes how every pod created and managed by this depl will behave
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: vipsdm10/client
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-srv
+spec:
+  selector: #enables srv to find pods that it is supposed to govern
+    app: client
+  ports:
+    - name: client
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

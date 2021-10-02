@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth #the purpose of this selector is to tell the depl how to find all the pods it creates
+  template: #describes how to create each diff pod that this depl creates
+    metadata:
+      labels:
+        app: auth
+    spec: #tells the pod how to behave
+      containers:
+        - name: auth
+          image: vipsdm10/auth
+          env: #list out all diff env vars we want access to inside this container
+            - name: MONGO_URI
+              value: 'mongodb://auth-mongo-srv:27017/auth'
+            - name: JWT_KEY #name of env var as it shows up inside the container
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret #name of secret we create
+                  key: JWT_KEY #the actual key inside of that secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec: #tells service how to behave. we do not define a type here coz default is clusterip which is what we want
+  selector: #tells service how to find the set of pods that it governs access to
+    app: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
