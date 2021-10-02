@@ -8,6 +8,8 @@ import { ExpirationCompleteListener } from './events/listeners/expiration-comple
 import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
 
 const start = async () => {
+  console.log('Starting....');
+
   if (!process.env.JWT_KEY) {
     throw new Error('JWT_KEY must be defined');
   } //TS never assumes a env var is defined so if we don't do this check it will gives us an error when we try to access JWT_KEY
