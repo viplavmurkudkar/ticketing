@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev --poll src/index.ts",
-    "test": "jest --watchAll --no-cache"
+    "test": "jest --watchAll --no-cache",
+    "test:ci": "jest"
   },
   "scriptsComments": {
     "testComment": "--watchAll tells jest to run all the diff tests in our proj whenver any file changes. --no-cache is related to our attempt to make TS work with jest"
